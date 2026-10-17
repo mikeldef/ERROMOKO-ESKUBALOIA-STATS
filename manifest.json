@@ -1,0 +1,11 @@
+{
+  "name": "Handball Stats",
+  "short_name": "Handball Stats",
+  "description": "Estadísticas de balonmano en directo",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#101b33",
+  "icons": []
+}

@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#64172d">
+  <meta name="description" content="Registro de estadísticas de balonmano, jugadores y minutos en pista.">
+  <link rel="manifest" href="./manifest.json">
+  <title>Handball Stats</title>
+  <style>
+    :root{--navy:#64172d;--navy2:#7c263f;--green:#e9c7d0;--blue:#f5e9ed;--bg:#f7f2f4;--card:#fff;--text:#29171d;--muted:#78656b;--line:#eadde1;--red:#b4233c;--amber:#a56500;--radius:16px;--burgundy:#64172d;--burgundy2:#8a304b}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select{font:inherit} button{cursor:pointer} button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #7eb5ff;outline-offset:2px}
+    header{background:var(--navy);color:#fff;padding:18px max(16px,env(safe-area-inset-left));position:sticky;top:0;z-index:10;box-shadow:0 3px 16px #0b163022}
+    .head{max-width:1180px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:1.25rem;font-weight:850;letter-spacing:.2px}.brand span{color:#e9c7d0}.sub{font-size:.78rem;color:#c4d0e4}
+    .status{font-size:.78rem;border:1px solid #5b6c89;border-radius:999px;padding:5px 9px;white-space:nowrap}
+    main{max-width:1180px;margin:20px auto;padding:0 14px 36px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:16px;padding-bottom:4px}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 15px;font-weight:750;color:var(--muted);white-space:nowrap}.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:1fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:0 5px 18px #20345008}.card h2,.card h3{margin:0 0 12px}.card h2{font-size:1.1rem}.card h3{font-size:1rem}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.between{justify-content:space-between}.muted{color:var(--muted)}.small{font-size:.84rem}.field{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.field label{font-size:.84rem;font-weight:750;color:#4d5c72}.field input,.field select{width:100%;border:1px solid #cbd5e2;border-radius:10px;padding:11px;background:#fff;color:var(--text)}
+    .btn{border:0;border-radius:11px;padding:11px 14px;font-weight:800;background:var(--navy);color:#fff}.btn.green{background:var(--burgundy);color:#fff}.btn.light{background:#e9eff7;color:var(--navy)}.btn.red{background:#ffeaec;color:#9f2634}.btn.outline{background:#fff;border:1px solid var(--line);color:var(--text)}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .timerbox{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,var(--navy),#8a304b);border-radius:16px;color:#fff;padding:18px}.timer{font-size:2.3rem;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:1px}.score{font-size:1.15rem;font-weight:800}.timerbuttons{display:flex;gap:7px;flex-wrap:wrap}.timerbuttons .btn{padding:9px 12px}.period{margin-top:9px;color:#d4e1f5;font-size:.83rem}
+    .playergrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.player{border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;text-align:left;min-height:70px;color:var(--text)}.player strong{display:block;font-size:1rem}.player small{display:block;color:var(--muted);margin-top:3px}.player.selected{border:2px solid var(--burgundy);background:#f8eaf0;box-shadow:0 0 0 2px #64172d18}.player.oncourt:after{content:"EN PISTA";display:inline-block;margin-top:5px;background:#f1dce3;color:#64172d;font-size:.65rem;font-weight:900;border-radius:5px;padding:2px 5px}
+    .actiongrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.action{border:1px solid var(--line);border-radius:11px;background:#fff;padding:13px 9px;text-align:center;font-weight:800;color:var(--text);min-height:58px}.action:active{transform:scale(.98)}.action .emoji{display:block;font-size:1.15rem;margin-bottom:3px}.action.attack{border-left:4px solid #8a304b}.action.error{border-left:4px solid #df9d28}.action.defense{border-left:4px solid #629ce8}.action.discipline{border-left:4px solid #d65c68}
+    .notice{background:#fff7df;border:1px solid #f2d88b;color:#76500a;padding:11px 12px;border-radius:10px;font-size:.85rem}.statsgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat{background:#f5f8fc;border-radius:12px;padding:12px}.stat b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums}.stat span{font-size:.78rem;color:var(--muted)}
+    .tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);font-size:.86rem}th{font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);background:#f7f9fc;position:sticky;top:0}td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.eventrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}.eventrow:last-child{border-bottom:0}.eventmeta{font-size:.78rem;color:var(--muted)}.event-actions{display:flex;gap:5px;align-items:center}.event-actions button{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:#fff}
+    .empty{padding:18px;text-align:center;color:var(--muted);background:#f7f9fc;border-radius:12px}.hidden{display:none!important}.pill{display:inline-block;background:#e9eff7;color:#34445e;border-radius:999px;padding:4px 8px;font-size:.75rem;font-weight:800}.divider{height:1px;background:var(--line);margin:14px 0}.sectiongap{display:grid;gap:14px}.playerrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.playerrow:last-child{border:0}.right{text-align:right}
+    footer{text-align:center;color:var(--muted);font-size:.76rem;padding:15px}
+    @media(min-width:760px){main{padding:0 22px 42px}.grid.two{grid-template-columns:minmax(300px,.85fr) minmax(0,1.15fr)}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.playergrid{grid-template-columns:repeat(3,minmax(0,1fr))}.actiongrid{grid-template-columns:repeat(3,minmax(0,1fr))}.statsgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.timer{font-size:2.8rem}.card{padding:18px}}
+    @media(max-width:390px){.timer{font-size:1.9rem}.timerbox{padding:14px}.playergrid{grid-template-columns:1fr 1fr}.btn{padding:10px 11px}.card{padding:13px}}
+  </style>
+</head>
+<body>
+<header><div class="head"><div><div class="brand">HANDBALL <span>STATS</span></div><div class="sub">Erromoko Eskubaloia · estadísticas de partido</div></div><div id="connection" class="status">● Preparando…</div></div></header>
+<main>
+  <nav class="tabs" aria-label="Secciones">
+    <button class="tab active" data-view="live">Partido</button>
+    <button class="tab" data-view="players">Plantilla</button>
+    <button class="tab" data-view="stats">Estadísticas</button>
+    <button class="tab" data-view="history">Historial</button>
+  </nav>
+
+  <section id="view-live" class="view active">
+    <div class="grid two">
+      <div class="sectiongap">
+        <div class="card">
+          <div class="row between"><h2>Partido actual</h2><span class="pill" id="matchState">Sin iniciar</span></div>
+          <div class="row">
+            <div class="field"><label for="opponent">Rival</label><input id="opponent" placeholder="Ej. Urduliz" maxlength="80"></div>
+            <div class="field" style="max-width:130px"><label for="periodLength">Minutos/parte</label><select id="periodLength"><option value="25">25</option><option value="30" selected>30</option><option value="20">20</option><option value="15">15</option></select></div>
+          </div>
+          <div class="timerbox" style="margin-top:13px">
+            <div><div class="timer" id="clock">00:00</div><div class="score"><span id="ourScore">0</span> — <span id="oppScore">0</span></div><div class="period" id="periodLabel">Parte 1 · 00:00 transcurridos</div></div>
+            <div class="timerbuttons"><button id="startTimer" class="btn green">▶ Iniciar</button><button id="pauseTimer" class="btn light">Ⅱ Pausar</button><button id="nextPeriod" class="btn light">Siguiente parte</button></div>
+          </div>
+          <div class="row between" style="margin-top:12px"><span class="small muted">Selecciona jugador y después registra la acción.</span><button id="newMatch" class="btn outline">Nuevo partido</button></div>
+        </div>
+        <div class="card">
+          <div class="row between"><h2>Jugadores</h2><span class="pill" id="selectedLabel">Ninguno seleccionado</span></div>
+          <div id="livePlayers" class="playergrid"></div>
+          <div class="divider"></div>
+          <div class="row between"><h3>En pista</h3><span id="courtCount" class="pill">0 jugadores</span></div>
+          <div id="courtPlayers"></div>
+          <div class="row" style="margin-top:12px"><button id="enterCourt" class="btn green">↗ Entra en pista</button><button id="leaveCourt" class="btn light">↘ Sale de pista</button></div>
+          <p class="small muted">El tiempo en pista se calcula con las entradas y salidas. Al iniciar un partido, marca qué jugadores están en pista.</p>
+        </div>
+      </div>
+      <div class="sectiongap">
+        <div class="card">
+          <div class="row between"><h2>Registrar acción</h2><span class="pill" id="actionPlayer">Elige jugador</span></div>
+          <div class="notice" id="actionHint">Primero selecciona un jugador en la lista de la izquierda. Después pulsa una acción.</div>
+          <h3 style="margin-top:15px">Ataque</h3>
+          <div class="actiongrid">
+            <button class="action attack" data-action="goal"><span class="emoji">🥅</span>Gol</button>
+            <button class="action attack" data-action="shot_saved"><span class="emoji">🧤</span>Lanzamiento parado</button>
+            <button class="action attack" data-action="shot_missed"><span class="emoji">↗️</span>Lanzamiento fuera</button>
+            <button class="action attack" data-action="shot_post"><span class="emoji">🎯</span>Al poste</button>
+            <button class="action attack" data-action="assist"><span class="emoji">🤝</span>Asistencia</button>
+            <button class="action attack" data-action="penalty_scored"><span class="emoji">7️⃣</span>Penalti marcado</button>
+            <button class="action attack" data-action="penalty_missed"><span class="emoji">❌</span>Penalti fallado/parado</button>
+            <button class="action attack" data-action="penalty_won_attack"><span class="emoji">7️⃣</span>Penalti provocado a favor</button>
+            <button class="action attack" data-action="forced_exclusion_attack"><span class="emoji">⏱️</span>Exclusión a favor provocada</button>
+          </div>
+          <h3 style="margin-top:16px">Errores y defensa</h3>
+          <div class="actiongrid">
+            <button class="action error" data-action="steps"><span class="emoji">👣</span>Pasos</button>
+            <button class="action error" data-action="double_dribble"><span class="emoji">🏀</span>Dobles</button>
+            <button class="action error" data-action="turnover"><span class="emoji">↩️</span>Pérdida de balón</button>
+            <button class="action defense" data-action="steal"><span class="emoji">✋</span>Recuperación</button>
+            <button class="action defense" data-action="block"><span class="emoji">🛡️</span>Bloqueo</button>
+            <button class="action defense" data-action="forced_exclusion"><span class="emoji">⏱️</span>Exclusión provocada en defensa</button>
+            <button class="action defense" data-action="penalty_conceded_defense"><span class="emoji">7️⃣</span>Penalti cometido en defensa</button>
+          </div>
+          <h3 style="margin-top:16px">Portería y disciplina</h3>
+          <div class="actiongrid">
+            <button class="action defense" data-action="save"><span class="emoji">🧤</span>Parada portero</button>
+            <button class="action defense" data-action="goal_conceded"><span class="emoji">🔴</span>Gol recibido</button>
+            <button class="action defense" data-action="penalty_save"><span class="emoji">🧱</span>Penalti parado</button>
+            <button class="action discipline" data-action="exclusion"><span class="emoji">🟨</span>Exclusión propia (2')</button>
+            <button class="action discipline" data-action="yellow_card"><span class="emoji">🟨</span>Tarjeta amarilla</button>
+            <button class="action discipline" data-action="red_card"><span class="emoji">🟥</span>Tarjeta roja</button>
+          </div>
+          <p class="small muted">Cada acción queda asociada al jugador seleccionado y al minuto de partido. Los goles y goles recibidos actualizan el marcador.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="row between"><h2>Últimas acciones</h2><button class="btn outline" id="undoLast">↶ Deshacer última</button></div>
+      <div id="recentEvents"></div>
+    </div>
+  </section>
+
+  <section id="view-players" class="view">
+    <div class="grid two">
+      <div class="card">
+        <h2>Añadir jugador</h2>
+        <form id="playerForm">
+          <div class="row"><div class="field"><label for="playerName">Nombre</label><input id="playerName" required maxlength="60" placeholder="Nombre y apellidos"></div><div class="field" style="max-width:100px"><label for="playerNumber">Dorsal</label><input id="playerNumber" type="number" min="0" max="99" required placeholder="7"></div></div>
+          <div class="row" style="margin-top:10px"><div class="field"><label for="playerPosition">Posición</label><select id="playerPosition"><option>Central</option><option>Extremo izquierdo</option><option>Extremo derecho</option><option>Lateral izquierdo</option><option>Lateral derecho</option><option>Pivote</option><option>Portero</option><option>Universal</option></select></div><button class="btn green" type="submit">+ Añadir</button></div>
+        </form>
+        <div class="divider"></div>
+        <button id="samplePlayers" class="btn light">Cargar plantilla de ejemplo</button>
+        <p class="small muted">Añade jugadores antes del partido. Puedes editar nombre, dorsal y posición o eliminar jugadores que todavía no tengan acciones.</p>
+      </div>
+      <div class="card"><h2>Plantilla</h2><div id="roster"></div></div>
+    </div>
+  </section>
+
+  <section id="view-stats" class="view">
+    <div class="card">
+      <div class="row between"><div><h2>Estadísticas por jugador</h2><div id="statsSubtitle" class="muted small">Partido actual</div></div><button id="exportCurrent" class="btn green">↓ Exportar CSV</button></div>
+      <div id="teamSummary" class="statsgrid" style="margin:14px 0"></div>
+      <div class="tablewrap"><table id="statsTable"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="view-history" class="view">
+    <div class="grid two">
+      <div class="card"><h2>Historial de partidos</h2><div id="historyList"></div><div class="divider"></div><button id="exportAll" class="btn green">↓ Exportar historial CSV</button><button id="backupData" class="btn light">Crear copia de seguridad JSON</button><div style="margin-top:10px"><label class="small" for="restoreFile">Restaurar copia JSON</label><input id="restoreFile" type="file" accept=".json,application/json"></div></div>
+      <div class="card"><h2>Datos y privacidad</h2><p>Esta web se puede publicar online y usar desde el móvil. En esta versión, los datos se guardan en el navegador del dispositivo.</p><div class="notice">Importante: publicar la web online no sincroniza automáticamente los partidos entre móviles u ordenadores. Para compartir la misma plantilla e historial entre dispositivos hay que conectar una base de datos segura.</div><p class="small muted">Tras la primera visita con conexión, puede abrirse sin conexión en ese dispositivo. Haz copias de seguridad JSON periódicas.</p><button id="clearAll" class="btn red">Borrar todos los datos</button></div>
+    </div>
+  </section>
+</main>
+<footer>ERROMOKO ESKUBALOIA · HANDBALL STATS · versión 2.0</footer>
+
+<script>
+(() => {
+  const STORAGE_KEY = "handballStats.v2";
+  const $ = id => document.getElementById(id);
+  const ACTIONS = {
+    goal:{label:"Gol",category:"Ataque"}, shot_saved:{label:"Lanzamiento parado",category:"Ataque"}, shot_missed:{label:"Lanzamiento fuera",category:"Ataque"}, shot_post:{label:"Lanzamiento al poste",category:"Ataque"},
+    assist:{label:"Asistencia",category:"Ataque"}, penalty_scored:{label:"Penalti marcado",category:"Ataque"}, penalty_missed:{label:"Penalti fallado/parado",category:"Ataque"}, penalty_won_attack:{label:"Penalti provocado a favor (ataque)",category:"Ataque"}, forced_exclusion_attack:{label:"Exclusión a favor provocada (ataque)",category:"Ataque"},
+    steps:{label:"Pasos",category:"Error"}, double_dribble:{label:"Dobles",category:"Error"}, turnover:{label:"Pérdida de balón",category:"Error"},
+    steal:{label:"Recuperación",category:"Defensa"}, block:{label:"Bloqueo",category:"Defensa"}, forced_exclusion:{label:"Exclusión provocada en defensa",category:"Defensa"}, penalty_conceded_defense:{label:"Penalti cometido en defensa (en contra)",category:"Defensa"},
+    save:{label:"Parada portero",category:"Portería"}, goal_conceded:{label:"Gol recibido",category:"Portería"}, penalty_save:{label:"Penalti parado",category:"Portería"},
+    exclusion:{label:"Exclusión propia (2')",category:"Disciplina"}, yellow_card:{label:"Tarjeta amarilla",category:"Disciplina"}, red_card:{label:"Tarjeta roja",category:"Disciplina"}
+  };
+  const emptyState = () => ({players:[],events:[],matches:[],match:{id:uid(),opponent:"",periodLength:30,period:1,elapsed:0,running:false,lastStartedAt:null,started:false,ended:false,createdAt:new Date().toISOString(),court:[],courtSince:{},courtSeconds:{}}});
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+  function load(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));if(x&&x.players&&x.match)return x;}catch(e){}return emptyState()}
+  let state = load(), selectedPlayerId = null, tickHandle = null;
+  function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+  function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  function player(id){return state.players.find(p=>p.id===id)}
+  function fmt(sec){sec=Math.max(0,Math.floor(sec||0));return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
+  function elapsed(){if(state.match.running&&state.match.lastStartedAt)return state.match.elapsed+(Date.now()-state.match.lastStartedAt)/1000;return state.match.elapsed}
+  function matchTime(){return Math.floor(elapsed())}
+  function currentPeriodTime(){return Math.max(0,matchTime()-(state.match.period-1)*state.match.periodLength*60)}
+  function nowInMatch(){return matchTime()}
+  function playerSeconds(p){let s=state.match.courtSeconds[p.id]||0;if(state.match.court.includes(p.id)&&state.match.courtSince[p.id]!=null)s+=Math.max(0,nowInMatch()-state.match.courtSince[p.id]);return Math.floor(s)}
+  function currentEvents(){return state.events}
+  function statsFor(p){
+    const ev=state.events.filter(e=>e.playerId===p.id);const count=k=>ev.filter(e=>e.action===k).length;
+    const goals=count("goal")+count("penalty_scored");
+    const shots=count("goal")+count("shot_saved")+count("shot_missed")+count("shot_post")+count("penalty_scored")+count("penalty_missed");
+    return {goals,shots,eff:shots?Math.round(goals/shots*100):0,assists:count("assist"),errors:count("steps")+count("double_dribble")+count("turnover"),steps:count("steps"),doubles:count("double_dribble"),turnovers:count("turnover"),saves:count("save")+count("penalty_save"),conceded:count("goal_conceded"),exclusions:count("exclusion"),forced:count("forced_exclusion"),forcedAttack:count("forced_exclusion_attack"),penaltyWon:count("penalty_won_attack"),penaltyAgainst:count("penalty_conceded_defense"),steals:count("steal"),blocks:count("block"),yellow:count("yellow_card"),red:count("red_card"),minutes:playerSeconds(p)}
+  }
+  function score(){return {ours:state.events.filter(e=>e.action==="goal"||e.action==="penalty_scored").length,opp:state.events.filter(e=>e.action==="goal_conceded").length}}
+  function eventStamp(){return {elapsed:nowInMatch(),period:state.match.period,periodTime:currentPeriodTime()}}
+  function addEvent(action, playerId){
+    if(!player(playerId)){alert("Selecciona un jugador primero.");return}
+    const stamp=eventStamp();state.events.push({id:uid(),action,playerId,at:new Date().toISOString(),...stamp});
+    state.match.started=true;save();render();
+  }
+  function deleteEvent(id){const i=state.events.findIndex(e=>e.id===id);if(i<0)return;if(!confirm("¿Eliminar esta acción? El marcador y las estadísticas se actualizarán."))return;state.events.splice(i,1);save();render()}
+  function editEvent(id){
+    const e=state.events.find(x=>x.id===id);if(!e)return;
+    const options=Object.entries(ACTIONS).map(([k,v])=>`${k}: ${v.label}`).join("\n");
+    const next=prompt("Escribe el código de la acción nueva:\n"+options,e.action);if(next===null)return;
+    if(!ACTIONS[next.trim()]){alert("Código no válido. No se ha modificado.");return}
+    e.action=next.trim();save();render();
+  }
+  function startTimer(){if(state.match.running)return;state.match.running=true;state.match.started=true;state.match.lastStartedAt=Date.now();save();render()}
+  function pauseTimer(){if(!state.match.running)return;state.match.elapsed=elapsed();state.match.running=false;state.match.lastStartedAt=null;save();render()}
+  function toggleCourt(id,enter){
+    if(!player(id)){alert("Selecciona un jugador.");return}
+    const m=state.match, isOn=m.court.includes(id), t=nowInMatch();
+    if(enter){if(isOn){alert("Este jugador ya está en pista.");return}m.court.push(id);m.courtSince[id]=t}
+    else{if(!isOn){alert("Este jugador no figura en pista.");return}m.courtSeconds[id]=(m.courtSeconds[id]||0)+Math.max(0,t-(m.courtSince[id]??t));m.court=m.court.filter(x=>x!==id);delete m.courtSince[id]}
+    m.started=true;save();render();
+  }
+  function closeCourtIntervals(){
+    const m=state.match,t=nowInMatch();
+    [...m.court].forEach(id=>{m.courtSeconds[id]=(m.courtSeconds[id]||0)+Math.max(0,t-(m.courtSince[id]??t));delete m.courtSince[id]});
+    m.court=[];m.courtSince={};
+  }
+  function finishMatch(){
+    pauseTimer();closeCourtIntervals();
+    const m=state.match;if(!m.started&&state.events.length===0){alert("Registra o inicia el partido antes de guardarlo.");return}
+    m.ended=true;m.finishedAt=new Date().toISOString();
+    const s=score();
+    state.matches.unshift({id:m.id,opponent:m.opponent||"Rival",createdAt:m.createdAt,finishedAt:m.finishedAt,periodLength:m.periodLength,elapsed:m.elapsed,ourScore:s.ours,oppScore:s.opp,players:JSON.parse(JSON.stringify(state.players)),events:JSON.parse(JSON.stringify(state.events)),courtSeconds:{...m.courtSeconds}});
+    state.match=emptyState().match;state.events=[];selectedPlayerId=null;save();render();alert("Partido guardado en el historial.");
+  }
+  function newMatch(){
+    if(state.match.started||state.events.length){if(!confirm("¿Guardar este partido en el historial y empezar uno nuevo?"))return;finishMatch();return}
+    state.match=emptyState().match;state.events=[];selectedPlayerId=null;save();render();
+  }
+  function renderPlayers(){
+    $("livePlayers").innerHTML=state.players.length?state.players.map(p=>`<button class="player ${selectedPlayerId===p.id?"selected":""} ${state.match.court.includes(p.id)?"oncourt":""}" data-player="${p.id}"><strong>#${escapeHtml(p.number)} ${escapeHtml(p.name)}</strong><small>${escapeHtml(p.position)} · ${fmt(playerSeconds(p))}</small></button>`).join(""):`<div class="empty" style="grid-column:1/-1">Añade jugadores en la pestaña Plantilla para empezar.</div>`;
+    $("roster").innerHTML=state.players.length?state.players.map(p=>`<div class="playerrow"><div><strong>#${escapeHtml(p.number)} ${escapeHtml(p.name)}</strong><div class="small muted">${escapeHtml(p.position)}</div></div><div class="row"><button class="btn light" data-edit-player="${p.id}">Editar</button><button class="btn red" data-delete-player="${p.id}">×</button></div></div>`).join(""):`<div class="empty">Todavía no hay jugadores.</div>`;
+    $("selectedLabel").textContent=player(selectedPlayerId)?`#${player(selectedPlayerId).number} ${player(selectedPlayerId).name}`:"Ninguno seleccionado";
+    $("actionPlayer").textContent=player(selectedPlayerId)?`#${player(selectedPlayerId).number} ${player(selectedPlayerId).name}`:"Elige jugador";
+    $("actionHint").textContent=player(selectedPlayerId)?"Jugador seleccionado. Pulsa una acción para registrarla.":"Primero selecciona un jugador en la lista de la izquierda. Después pulsa una acción.";
+    $("courtCount").textContent=`${state.match.court.length} jugador${state.match.court.length===1?"":"es"}`;
+    $("courtPlayers").innerHTML=state.match.court.length?state.match.court.map(id=>{const p=player(id);return p?`<div class="playerrow"><div><strong>#${escapeHtml(p.number)} ${escapeHtml(p.name)}</strong><div class="small muted">En pista · ${fmt(playerSeconds(p))}</div></div><button class="btn light" data-leave="${p.id}">Sale</button></div>`:""}).join(""):`<div class="small muted">No hay jugadores marcados en pista.</div>`;
+  }
+  function renderRecent(){
+    const ev=state.events.slice(-8).reverse();
+    $("recentEvents").innerHTML=ev.length?ev.map(e=>{const p=player(e.playerId);return `<div class="eventrow"><div><strong>${escapeHtml(ACTIONS[e.action]?.label||e.action)}</strong> · ${escapeHtml(p?p.name:"Jugador eliminado")}<div class="eventmeta">Parte ${e.period} · ${fmt(e.periodTime)} · ${new Date(e.at).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}</div></div><div class="event-actions"><button data-edit-event="${e.id}" title="Cambiar acción">Editar</button><button data-delete-event="${e.id}" title="Eliminar acción">×</button></div></div>`}).join(""):`<div class="empty">Las acciones del partido aparecerán aquí.</div>`;
+  }
+  function renderStats(){
+    const s=score();$("ourScore").textContent=s.ours;$("oppScore").textContent=s.opp;
+    $("statsSubtitle").textContent=`${state.match.opponent?"Rival: "+state.match.opponent:"Partido actual"} · ${state.events.length} acciones`;
+    const totalGoals=state.events.filter(e=>["goal","penalty_scored"].includes(e.action)).length;
+    const totalShots=state.events.filter(e=>["goal","shot_saved","shot_missed","shot_post","penalty_scored","penalty_missed"].includes(e.action)).length;
+    const totalErrors=state.events.filter(e=>["steps","double_dribble","turnover"].includes(e.action)).length;
+    const totalEx=state.events.filter(e=>e.action==="exclusion").length;
+    $("teamSummary").innerHTML=[["Goles",totalGoals],["Lanzamientos",totalShots],["Efectividad",`${totalShots?Math.round(totalGoals/totalShots*100):0}%`],["Exclusiones",totalEx]].map(x=>`<div class="stat"><b>${x[1]}</b><span>${x[0]}</span></div>`).join("");
+    const headers=["Jugador","Minutos","Goles","Lanz.","Efect.","Asist.","Errores","Pasos","Dobles","Pérdidas","Paradas","Exclus.","Excl. prov. defensa","Excl. a favor ataque","Penaltis a favor","Penaltis en contra","Recup.","Bloq."];
+    $("statsTable").querySelector("thead").innerHTML="<tr>"+headers.map((h,i)=>`<th class="${i>0?"num":""}">${h}</th>`).join("")+"</tr>";
+    $("statsTable").querySelector("tbody").innerHTML=state.players.map(p=>{const x=statsFor(p);return `<tr><td><strong>#${escapeHtml(p.number)} ${escapeHtml(p.name)}</strong><div class="small muted">${escapeHtml(p.position)}</div></td><td class="num">${fmt(x.minutes)}</td><td class="num">${x.goals}</td><td class="num">${x.shots}</td><td class="num">${x.eff}%</td><td class="num">${x.assists}</td><td class="num">${x.errors}</td><td class="num">${x.steps}</td><td class="num">${x.doubles}</td><td class="num">${x.turnovers}</td><td class="num">${x.saves}</td><td class="num">${x.exclusions}</td><td class="num">${x.forced}</td><td class="num">${x.forcedAttack}</td><td class="num">${x.penaltyWon}</td><td class="num">${x.penaltyAgainst}</td><td class="num">${x.steals}</td><td class="num">${x.blocks}</td></tr>`}).join("")||`<tr><td colspan="18">Añade jugadores en la pestaña Plantilla.</td></tr>`;
+  }
+  function renderHistory(){
+    $("historyList").innerHTML=state.matches.length?state.matches.map(m=>`<div class="playerrow"><div><strong>${escapeHtml(m.opponent)} · ${m.ourScore}–${m.oppScore}</strong><div class="small muted">${new Date(m.finishedAt||m.createdAt).toLocaleString("es-ES")} · ${m.events.length} acciones</div></div><div class="row"><button class="btn light" data-view-match="${m.id}">Ver</button><button class="btn red" data-delete-match="${m.id}">×</button></div></div>`).join(""):`<div class="empty">Todavía no hay partidos guardados. Para guardar uno, pulsa “Nuevo partido” durante o después del partido y confirma.</div>`;
+  }
+  function render(){
+    $("opponent").value=state.match.opponent||"";$("periodLength").value=String(state.match.periodLength||30);
+    $("clock").textContent=fmt(matchTime());$("periodLabel").textContent=`Parte ${state.match.period} · ${fmt(currentPeriodTime())} transcurridos`;
+    $("matchState").textContent=state.match.ended?"Finalizado":state.match.running?"En juego":state.match.started?"Pausado":"Sin iniciar";
+    $("startTimer").disabled=state.match.running;$("pauseTimer").disabled=!state.match.running;
+    $("startTimer").textContent=state.match.running?"▶ En juego":"▶ Iniciar";
+    renderPlayers();renderRecent();renderStats();renderHistory();
+    $("connection").textContent=navigator.onLine?"● Disponible":"● Sin conexión";
+  }
+  function csvEscape(v){return '"'+String(v??"").replace(/"/g,'""')+'"'}
+  function download(name,content,type="text/csv;charset=utf-8;"){const blob=new Blob(["\ufeff",content],{type});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+  function exportCurrent(){
+    const rows=[["Dorsal","Jugador","Posición","Minutos","Goles","Lanzamientos","Efectividad %","Asistencias","Errores","Pasos","Dobles","Pérdidas","Paradas","Goles recibidos","Exclusiones propias","Exclusiones provocadas en defensa","Exclusiones a favor en ataque","Penaltis provocados a favor","Penaltis cometidos en defensa","Recuperaciones","Bloqueos"]];
+    state.players.forEach(p=>{const s=statsFor(p);rows.push([p.number,p.name,p.position,fmt(s.minutes),s.goals,s.shots,s.eff,s.assists,s.errors,s.steps,s.doubles,s.turnovers,s.saves,s.conceded,s.exclusions,s.forced,s.forcedAttack,s.penaltyWon,s.penaltyAgainst,s.steals,s.blocks])});
+    download("handball-stats-partido.csv",rows.map(r=>r.map(csvEscape).join(";")).join("\r\n"));
+  }
+  function exportAll(){
+    const rows=[["Partido","Fecha","Equipo","Rival","Resultado","Dorsal","Jugador","Posición","Acción","Parte","Tiempo"]];
+    state.matches.forEach(m=>m.events.forEach(e=>{const p=m.players.find(x=>x.id===e.playerId);rows.push([m.id,new Date(m.finishedAt||m.createdAt).toLocaleDateString("es-ES"),"Mi equipo",m.opponent,`${m.ourScore}-${m.oppScore}`,p?.number??"",p?.name??"",p?.position??"",ACTIONS[e.action]?.label||e.action,e.period,fmt(e.periodTime)])}));
+    download("handball-stats-historial.csv",rows.map(r=>r.map(csvEscape).join(";")).join("\r\n"));
+  }
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+b.dataset.view));render()}));
+  $("livePlayers").addEventListener("click",e=>{const b=e.target.closest("[data-player]");if(b){selectedPlayerId=b.dataset.player;renderPlayers()}});
+  document.querySelectorAll("[data-action]").forEach(b=>b.addEventListener("click",()=>addEvent(b.dataset.action,selectedPlayerId)));
+  $("startTimer").addEventListener("click",startTimer);$("pauseTimer").addEventListener("click",pauseTimer);
+  $("nextPeriod").addEventListener("click",()=>{pauseTimer();const max=Math.ceil(120/(state.match.periodLength||30));if(state.match.period<max)state.match.period++;else state.match.period++;save();render()});
+  $("opponent").addEventListener("change",e=>{state.match.opponent=e.target.value;save()});
+  $("periodLength").addEventListener("change",e=>{if(state.match.started&&!confirm("Cambiar la duración de parte después de iniciar puede afectar a la lectura del tiempo. ¿Continuar?")){e.target.value=state.match.periodLength;return}state.match.periodLength=Number(e.target.value);save();render()});
+  $("enterCourt").addEventListener("click",()=>toggleCourt(selectedPlayerId,true));$("leaveCourt").addEventListener("click",()=>toggleCourt(selectedPlayerId,false));
+  $("courtPlayers").addEventListener("click",e=>{const b=e.target.closest("[data-leave]");if(b)toggleCourt(b.dataset.leave,false)});
+  $("undoLast").addEventListener("click",()=>{if(!state.events.length)return;const e=state.events[state.events.length-1];if(confirm(`¿Deshacer "${ACTIONS[e.action].label}"?`)){state.events.pop();save();render()}});
+  $("recentEvents").addEventListener("click",e=>{const del=e.target.closest("[data-delete-event]"),edit=e.target.closest("[data-edit-event]");if(del)deleteEvent(del.dataset.deleteEvent);if(edit)editEvent(edit.dataset.editEvent)});
+  $("playerForm").addEventListener("submit",e=>{e.preventDefault();const name=$("playerName").value.trim(),number=Number($("playerNumber").value);if(!name)return;if(state.players.some(p=>p.number===number)){if(!confirm("Ya existe ese dorsal. ¿Añadirlo igualmente?"))return}state.players.push({id:uid(),name,number,position:$("playerPosition").value});$("playerName").value="";$("playerNumber").value="";save();render()});
+  $("samplePlayers").addEventListener("click",()=>{if(state.players.length&&!confirm("Se añadirán jugadores de ejemplo a la plantilla actual. ¿Continuar?"))return;const names=[["Portero 1",1,"Portero"],["Extremo izquierdo",2,"Extremo izquierdo"],["Lateral izquierdo",3,"Lateral izquierdo"],["Central",4,"Central"],["Lateral derecho",5,"Lateral derecho"],["Extremo derecho",6,"Extremo derecho"],["Pivote",7,"Pivote"]];names.forEach(([name,number,position])=>{if(!state.players.some(p=>p.number===number))state.players.push({id:uid(),name,number,position})});save();render()});
+  $("roster").addEventListener("click",e=>{const del=e.target.closest("[data-delete-player]"),edit=e.target.closest("[data-edit-player]");if(del){const id=del.dataset.deletePlayer;if(state.events.some(x=>x.playerId===id)){alert("Este jugador tiene acciones registradas. No se puede eliminar durante este partido.");return}if(!confirm("¿Eliminar jugador de la plantilla?"))return;state.players=state.players.filter(p=>p.id!==id);state.match.court=state.match.court.filter(x=>x!==id);delete state.match.courtSince[id];delete state.match.courtSeconds[id];if(selectedPlayerId===id)selectedPlayerId=null;save();render()}if(edit){const p=player(edit.dataset.editPlayer);if(!p)return;const name=prompt("Nombre del jugador:",p.name);if(name===null)return;const n=prompt("Dorsal:",String(p.number));if(n===null)return;const pos=prompt("Posición:",p.position);if(pos===null)return;p.name=name.trim()||p.name;p.number=Number(n)||0;p.position=pos.trim()||p.position;save();render()}});
+  $("newMatch").addEventListener("click",newMatch);
+  $("exportCurrent").addEventListener("click",exportCurrent);$("exportAll").addEventListener("click",exportAll);
+  $("backupData").addEventListener("click",()=>download("handball-stats-backup.json",JSON.stringify(state,null,2),"application/json"));
+  $("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!data.players||!data.match||!Array.isArray(data.events)||!Array.isArray(data.matches))throw new Error("Formato no válido");if(!confirm("Restaurar esta copia reemplazará los datos actuales. ¿Continuar?"))return;state=data;selectedPlayerId=null;save();render();alert("Copia restaurada.")}catch(err){alert("No se pudo restaurar: archivo JSON no válido.")}e.target.value=""});
+  $("clearAll").addEventListener("click",()=>{if(!confirm("Esto borrará la plantilla, el partido actual y todo el historial guardado en este navegador. ¿Estás seguro?"))return;if(!confirm("Última confirmación: ¿borrar todos los datos?"))return;state=emptyState();selectedPlayerId=null;save();render()});
+  document.querySelectorAll("[data-view-match]").forEach(()=>{});
+  $("historyList").addEventListener("click",e=>{const del=e.target.closest("[data-delete-match]"),view=e.target.closest("[data-view-match]");if(del){if(!confirm("¿Eliminar este partido del historial?"))return;state.matches=state.matches.filter(m=>m.id!==del.dataset.deleteMatch);save();render()}if(view){const m=state.matches.find(x=>x.id===view.dataset.viewMatch);if(!m)return;const text=m.events.map(ev=>{const p=m.players.find(x=>x.id===ev.playerId);return `${fmt(ev.periodTime)} P${ev.period} — ${p?.name||"Jugador"}: ${ACTIONS[ev.action]?.label||ev.action}`}).join("\n");alert(`${m.opponent} · ${m.ourScore}-${m.oppScore}\n${new Date(m.finishedAt||m.createdAt).toLocaleString("es-ES")}\n\n${text||"Sin eventos"}`)}});
+  window.addEventListener("online",()=>render());window.addEventListener("offline",()=>render());
+  window.addEventListener("beforeunload",()=>{if(state.match.running){state.match.elapsed=elapsed();state.match.lastStartedAt=Date.now();save()}});
+  if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  // Keep display and playing time fresh; elapsed is computed from the timestamp, not interval accumulation.
+  tickHandle=setInterval(()=>{if(state.match.running){$("clock").textContent=fmt(matchTime());$("periodLabel").textContent=`Parte ${state.match.period} · ${fmt(currentPeriodTime())} transcurridos`;const s=score();$("ourScore").textContent=s.ours;$("oppScore").textContent=s.opp;renderPlayers();renderStats()}},1000);
+  save();render();
+})();
+</script>
+</body>
+</html>
